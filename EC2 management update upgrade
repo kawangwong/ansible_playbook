@@ -1,0 +1,20 @@
+- name: "FirstPlay"
+  hosts: AWS
+  become: yes
+
+  tasks:
+    - name: "ping"
+      ping:
+
+    - name: "uninstall stress"
+      apt:
+       name: stress
+       state: present
+
+    - name: "update the repo"
+      apt:
+        update_cache: yes
+
+    - name: "upgrade all packages"
+      apt:
+        upgrade: yes #upgrades and install new dependencies if necessary, no removals.
