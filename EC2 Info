@@ -1,0 +1,8 @@
+  - name: Gather information about all instances
+    community.aws.ec2_instance_info:
+      region: us-west-2
+      access_key: *
+      secret_key: *
+    register: instances
+  - debug: var=instances
+#pulls ec2 info from region
