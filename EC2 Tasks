@@ -1,0 +1,18 @@
+- name: EC2 Playbook
+  hosts: localhost
+  gather_facts: false
+  vars:
+    region: us-east-1
+    instance_ids: *place values of ids here
+    access_key: *place access_key here
+    secret_key: *place secret_key here
+  tasks:
+    - name: Change the state of the EC2.
+      community.aws.ec2_instance:
+        state: terminated #change the value here to what you want the EC2 to do
+        instance_ids:
+          - '{{instance_ids}}'
+        region: '{{region}}'
+        aws_access_key: '{{access_key}}'
+        aws_secret_key: '{{secret_key}}'
+        wait: yes
