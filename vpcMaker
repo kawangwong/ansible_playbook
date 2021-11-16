@@ -1,0 +1,20 @@
+- name: Start EC2 Instances
+  hosts: localhost
+  gather_facts: false
+  vars:
+    region: us-east-1
+    access_key: 
+    secret_key: 
+    vpcBlock: 192.168.0.0/16
+    tenancy: default #set to dedicated if you are working with PHI. It sets all Ec2 in said VPC to work on same phyiscal machine
+  tasks:
+  - name: create a VPC with dedicated tenancy and a couple of tags
+    amazon.aws.ec2_vpc_net:
+      access_key: '{{access_key}}'
+      secret_key: '{{secret_key}}'
+      name: VPC1
+      cidr_block: '{{vpcBlock}}'
+      region: '{{region}}'
+      tags:
+        key: value
+      tenancy: '{{tenancy}}'
