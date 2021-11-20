@@ -1,12 +1,20 @@
-- name: Start EC2 Instances
+- name: Make a Network
   hosts: localhost
   gather_facts: false
   vars:
     region: us-east-1
-    access_key: 
-    secret_key: 
+    access_key:
+    secret_key:
     vpcBlock: 192.168.0.0/16
+    cidr1: 192.168.0.0/18 #public
+    cidr2: 192.168.64.0/18 #private
+    cidr3: 192.168.128.0/18 #public
+    cidr4: 192.168.192.0/18 #private
     tenancy: default #set to dedicated if you are working with PHI. It sets all Ec2 in said VPC to work on same phyiscal machine
+    key: usedFor
+    value: testing
+    zone1: us-east-1a
+    zone2: us-east-1b
   tasks:
   - name: create a VPC with dedicated tenancy and a couple of tags
     amazon.aws.ec2_vpc_net:
@@ -16,5 +24,52 @@
       cidr_block: '{{vpcBlock}}'
       region: '{{region}}'
       tags:
-        key: value
+        '{{key}}': '{{value}}'
       tenancy: '{{tenancy}}'
+  - name: Grab VPC_ With specific tags
+    command: aws ec2 describe-vpcs --filter Name=tag:Name,Values=VPC1 --query Vpcs[].VpcId --output text
+    register: vpc
+  - name: Set VPC ID in variable
+    set_fact:
+      vpcid:  "{{vpc.stdout}}"
+  - debug: var=vpcid
+
+  - name: subnet 1 maker
+    amazon.aws.ec2_vpc_subnet:
+      state: present
+      vpc_id: '{{vpcid}}'
+      cidr: '{{cidr1}}'
+      az: '{{zone1}}'
+      tags:
+        usedFor: subnet1
+    register: subnet1
+
+  - name: subnet 2 maker
+    amazon.aws.ec2_vpc_subnet:
+      state: present
+      vpc_id: '{{vpcid}}'
+      cidr: '{{cidr2}}'
+      az: '{{zone1}}'
+      tags:
+        usedFor: subnet2
+    register: subnet2
+
+  - name: subnet 3 maker
+    amazon.aws.ec2_vpc_subnet:
+      state: present
+      vpc_id: '{{vpcid}}'
+      cidr: '{{cidr3}}'
+      az: '{{zone2}}'
+      tags:
+        usedFor: subnet3
+    register: subnet3
+
+  - name: subnet 4 maker
+    amazon.aws.ec2_vpc_subnet:
+      state: present
+      vpc_id: '{{vpcid}}'
+      cidr: '{{cidr4}}'
+      az: '{{zone2}}'
+      tags:
+        usedFor: subnet4
+    register: subnet4
