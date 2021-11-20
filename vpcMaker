@@ -4,7 +4,7 @@
   vars:
     region: us-east-1
     access_key:
-    secret_key:
+    secret_key: 
     vpcBlock: 192.168.0.0/16
     cidr1: 192.168.0.0/18 #public
     cidr2: 192.168.64.0/18 #private
@@ -81,15 +81,22 @@
   - name: grab subnet ids
     command: aws ec2 describe-subnets --filter Name=tag:usedFor,Values=subnet1 --query Subnets[].SubnetId --output text
     register: subnetid1
+  # - debug: var=subnetid1
+  - name: grab subnet ids
     command: aws ec2 describe-subnets --filter Name=tag:usedFor,Values=subnet2 --query Subnets[].SubnetId --output text
     register: subnetid2
+  # - debug: var=subnetid2
+  - name: grab subnet ids
     command: aws ec2 describe-subnets --filter Name=tag:usedFor,Values=subnet3 --query Subnets[].SubnetId --output text
     register: subnetid3
+  # - debug: var=subnetid3
+  - name: grab subnet ids
     command: aws ec2 describe-subnets --filter Name=tag:usedFor,Values=subnet4 --query Subnets[].SubnetId --output text
     register: subnetid4
-    
+  # - debug: var=subnetid4
+
   - name: Set variables for for subnet ID
-    set_facts:
+    set_fact:
       subnetid_1: '{{subnetid1.stdout}}'
       subnetid_2: '{{subnetid2.stdout}}'
       subnetid_3: '{{subnetid3.stdout}}'
@@ -111,4 +118,13 @@
         - '{{subnetid_3}}'
       routes:
         - dest: 0.0.0.0/0
-          gateway_id: ""
+          gateway_id: '{{igw.gateway_id}}'
+
+  - name: private route maker
+    ec2_vpc_route_table:
+      vpc_id: '{{vpcid}}'
+      tags:
+        usedFor: privateRoute
+      subnets:
+        - '{{subnetid_2}}'
+        - '{{subnetid_4}}'
