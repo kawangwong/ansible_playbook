@@ -1,0 +1,26 @@
+  # - local_action: copy content="{{"vpcid:" + " " + vpcid }}" dest=./file.yaml
+  # - local_action: copy content="{{"subnetid_1:" + " " + subnetid_1 }}" dest=./file.yaml
+  # - local_action: copy content="{{"subnetid_2:" + " " + subnetid_2 }}" dest=./file.yaml
+  # - local_action: copy content="{{"subnetid_3:" + " " + subnetid_3 }}" dest=./file.yaml
+  # - local_action: copy content="{{"subnetid_4:" + " " + subnetid_4 }}" dest=./file.yaml
+  # - copy:
+  #     dest: ./file.yaml
+  #     content: "{{ item }}"
+  #   with_items:
+  #   -  "{{ 'vpcid:' + ' ' + vpcid }}"
+  #   -  "{{ 'subnetid_1:' + ' ' + subnetid_1 }}"
+  
+  Just notes on how to copy stuff from a variable to an output of text.
+  
+    - name: Saving variables to file
+    lineinfile:
+      path: ./file.yaml
+      line: "{{ item }}"
+      create: yes
+    with_items:
+      -  "{{ 'vpcid:' + ' ' + vpcid }}"
+      -  "{{ 'subnetid_1:' + ' ' + subnetid_1 }}"
+      
+      This is more efficient.
+      
+      
